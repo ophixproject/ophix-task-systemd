@@ -257,14 +257,15 @@ def sync_units(tasks, unit_dir=DEFAULT_UNIT_DIR, user=DEFAULT_USER):
         name = task.get("name", "unnamed")
         stem = stem_for_task(task)
 
-        if not task.get("enabled", True):
+        if not task.get("enabled", True) or task.get("paused", False):
             if stem in before:
                 try:
                     _remove_stem(unit_dir, stem)
                     summary["removed"] += 1
                 except OSError as exc:
                     summary["errors"].append("{}: {}".format(name, exc))
-            summary["skipped"].append("{} (disabled)".format(name))
+            label = "paused" if task.get("paused", False) else "disabled"
+            summary["skipped"].append("{} ({})".format(name, label))
             continue
 
         calendar, skip_reason = resolve_calendar(task)
@@ -312,8 +313,9 @@ def show_units(tasks, user=DEFAULT_USER):
         name = task.get("name", "unnamed")
         stem = stem_for_task(task)
 
-        if not task.get("enabled", True):
-            lines.append("# SKIP (disabled): {}".format(name))
+        if not task.get("enabled", True) or task.get("paused", False):
+            label = "paused" if task.get("paused", False) else "disabled"
+            lines.append("# SKIP ({}): {}".format(label, name))
             continue
 
         calendar, skip_reason = resolve_calendar(task)
