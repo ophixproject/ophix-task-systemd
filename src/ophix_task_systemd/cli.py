@@ -28,7 +28,7 @@ from task_client.core import get_tasks
 
 def cmd_sync(args):
     try:
-        tasks = get_tasks(schedule=args.schedule or None)
+        tasks = get_tasks(schedule=args.schedule or None, scheduler="systemd")
     except Exception as exc:
         print("Failed to fetch tasks: {}".format(exc))
         sys.exit(1)
@@ -55,7 +55,7 @@ def cmd_sync(args):
 
 def cmd_show(args):
     try:
-        tasks = get_tasks(schedule=args.schedule or None)
+        tasks = get_tasks(schedule=args.schedule or None, scheduler="systemd")
     except Exception as exc:
         print("Failed to fetch tasks: {}".format(exc))
         sys.exit(1)

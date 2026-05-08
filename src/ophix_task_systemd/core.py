@@ -12,18 +12,16 @@ Units are identified as Ophix-managed by the ophix- prefix on the filename.
 On every sync the full set is reconciled: new units written, changed units
 updated, tasks no longer in the server response cleaned up.
 
-Interval format detection
--------------------------
-The server stores the interval as a free-form string. This client accepts
-systemd OnCalendar= expressions (e.g. '*-*-* 02:00:00', 'daily', 'Mon *-*-*
-08:00:00'). Cron expressions (5-field format, e.g. '0 2 * * *') are detected
-and skipped with a warning — use ophix-task-crontab for those hosts.
+Interval format
+---------------
+Tasks fetched by this client are pre-filtered by ?scheduler=systemd, so the
+interval field already contains a systemd OnCalendar= expression. It is used
+verbatim — no conversion is performed. The server validates the format at
+creation time.
 
 Disabled tasks
 --------------
-Tasks with enabled=False have any existing units stopped and removed. They do
-not appear as commented-out entries (there is no systemd equivalent). The task
-remains visible in the Ophix admin.
+Tasks with enabled=False have any existing units stopped and removed.
 
 Output handling
 ---------------
@@ -43,40 +41,6 @@ from typing import Dict, List, Optional, Set, Tuple
 MANAGED_PREFIX = "ophix-"
 DEFAULT_UNIT_DIR = "/etc/systemd/system"
 DEFAULT_USER = "root"
-
-_SYSTEMD_SHORTHANDS = frozenset([
-    "annually", "daily", "hourly", "minutely", "monthly",
-    "quarterly", "semi-annually", "weekly", "yearly",
-])
-
-
-# ---------------------------------------------------------------------------
-# Format detection
-# ---------------------------------------------------------------------------
-
-def detect_interval_format(interval):
-    # type: (str) -> str
-    """
-    Return 'systemd', 'cron', or 'unknown'.
-
-    systemd:  a shorthand word (daily, hourly …), or contains ':' (time
-              component), or matches a date pattern (*-*-* / YYYY-MM-DD),
-              or starts with a day-of-week abbreviation.
-    cron:     exactly 5 whitespace-separated tokens.
-    unknown:  anything else.
-    """
-    s = interval.strip()
-    if s.lower() in _SYSTEMD_SHORTHANDS:
-        return "systemd"
-    if ":" in s:
-        return "systemd"
-    if re.match(r"^[\d*]", s) and "-" in s:
-        return "systemd"
-    if re.match(r"^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)", s, re.IGNORECASE):
-        return "systemd"
-    if len(s.split()) == 5:
-        return "cron"
-    return "unknown"
 
 
 # ---------------------------------------------------------------------------
@@ -124,12 +88,6 @@ def resolve_calendar(task):
 
     if not interval:
         return None, "no run_at or interval set"
-
-    fmt = detect_interval_format(interval)
-    if fmt == "cron":
-        return None, "interval is a cron expression — use ophix-task-crontab instead"
-    if fmt == "unknown":
-        return None, "unrecognised interval format: {}".format(interval)
 
     return interval, None
 
