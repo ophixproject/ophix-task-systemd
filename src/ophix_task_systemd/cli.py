@@ -4,16 +4,12 @@ ophix_task_systemd.cli
 Command-line interface for the ophix-task-systemd Tier 2 client.
 
 Entry point: task-systemd (registered in pyproject.toml).
-
-Commands:
-    sync  — fetch tasks from the server and apply as systemd unit files
-    show  — print the unit files that would be written, without writing
-    clear — stop, disable, and remove all ophix-managed units
 """
 
-import argparse
 import sys
+import types
 
+from client_core.parser import make_main
 from ophix_task_systemd._version import __version__
 from ophix_task_systemd.core import (
     DEFAULT_UNIT_DIR,
@@ -22,9 +18,12 @@ from ophix_task_systemd.core import (
     show_units,
     sync_units,
 )
-
 from task_client.core import get_tasks
 
+
+# ---------------------------------------------------------------------------
+# Commands
+# ---------------------------------------------------------------------------
 
 def cmd_sync(args):
     try:
@@ -79,73 +78,52 @@ def cmd_clear(args):
         print("No ophix-managed units found in {}.".format(args.unit_dir))
 
 
-def build_parser():
-    # type: () -> argparse.ArgumentParser
-    parser = argparse.ArgumentParser(
-        prog="task-systemd",
-        description="Apply ophix-tasks schedules as systemd timer units.",
-    )
-    parser.add_argument(
-        "--version",
-        action="version",
-        version="task-systemd {}".format(__version__),
-    )
-
-    sub = parser.add_subparsers(dest="command", metavar="COMMAND")
-
-    # sync
-    p = sub.add_parser("sync", help="Fetch tasks and write systemd unit files.")
-    p.add_argument("--schedule", default="", help="Only fetch tasks from this named schedule (default: all)")
-    p.add_argument(
-        "--user",
-        default=DEFAULT_USER,
-        help="Unix user to run tasks as (default: {})".format(DEFAULT_USER),
-    )
-    p.add_argument(
-        "--unit-dir",
-        default=DEFAULT_UNIT_DIR,
-        help="Directory to write unit files (default: {})".format(DEFAULT_UNIT_DIR),
-    )
-
-    # show
-    p = sub.add_parser("show", help="Print unit files that would be written, without writing.")
-    p.add_argument("--schedule", default="", help="Only fetch tasks from this named schedule (default: all)")
-    p.add_argument(
-        "--user",
-        default=DEFAULT_USER,
-        help="Unix user to run tasks as (default: {})".format(DEFAULT_USER),
-    )
-
-    # clear
-    p = sub.add_parser("clear", help="Stop, disable, and remove all ophix-managed units.")
-    p.add_argument(
-        "--unit-dir",
-        default=DEFAULT_UNIT_DIR,
-        help="Directory to remove units from (default: {})".format(DEFAULT_UNIT_DIR),
-    )
-
-    return parser
-
+# ---------------------------------------------------------------------------
+# Command registry
+# ---------------------------------------------------------------------------
 
 COMMANDS = {
-    "sync": cmd_sync,
-    "show": cmd_show,
-    "clear": cmd_clear,
+    "sync": {
+        "help": "Fetch tasks from the server and write systemd unit files.",
+        "arguments": [
+            {"name": "--schedule", "default": "",
+             "help": "Only fetch tasks from this named schedule (default: all)"},
+            {"name": "--user", "default": DEFAULT_USER,
+             "help": "Unix user to run tasks as (default: {})".format(DEFAULT_USER)},
+            {"name": "--unit-dir", "dest": "unit_dir", "default": DEFAULT_UNIT_DIR,
+             "help": "Directory to write unit files (default: {})".format(DEFAULT_UNIT_DIR)},
+        ],
+        "handler": cmd_sync,
+    },
+
+    "show": {
+        "help": "Print unit files that would be written, without writing them.",
+        "arguments": [
+            {"name": "--schedule", "default": "",
+             "help": "Only fetch tasks from this named schedule (default: all)"},
+            {"name": "--user", "default": DEFAULT_USER,
+             "help": "Unix user to run tasks as (default: {})".format(DEFAULT_USER)},
+        ],
+        "handler": cmd_show,
+    },
+
+    "clear": {
+        "help": "Stop, disable, and remove all ophix-managed units.",
+        "arguments": [
+            {"name": "--unit-dir", "dest": "unit_dir", "default": DEFAULT_UNIT_DIR,
+             "help": "Directory to remove units from (default: {})".format(DEFAULT_UNIT_DIR)},
+        ],
+        "handler": cmd_clear,
+    },
 }
 
+_CONFIG = types.SimpleNamespace(
+    prog="task-systemd",
+    description="Apply ophix-tasks schedules as systemd timer units.",
+    version=__version__,
+)
 
-def main():
-    parser = build_parser()
-    args = parser.parse_args()
-    if not args.command:
-        parser.print_help()
-        sys.exit(0)
-    handler = COMMANDS.get(args.command)
-    if handler:
-        handler(args)
-    else:
-        parser.print_help()
-        sys.exit(1)
+main = make_main(_CONFIG, COMMANDS)
 
 
 if __name__ == "__main__":

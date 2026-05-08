@@ -13,6 +13,7 @@ authors = [
     { name = "Ophix Project" }
 ]
 dependencies = [
+    "ophix-client-core>=2026.05.08.01",
     "ophix-task-client>=2026.05.07.02",
 ]
 
