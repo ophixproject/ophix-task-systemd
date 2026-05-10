@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ophix-task-systemd"
-version = "2026.05.08.02"
+version = "2026.05.11.01"
 description = "systemd timer Tier 2 client for ophix-tasks — applies task schedules as systemd unit files"
 readme = "README.md"
 requires-python = ">=3.7"
