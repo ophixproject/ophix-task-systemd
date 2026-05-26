@@ -1,6 +1,6 @@
 # ophix-task-systemd
 
-systemd timer Tier 2 client for [Ophix Project](https://ophixproject.com) task scheduling.
+systemd timer Tier 2 client for [Ophix Project](https://ophix.io) task scheduling.
 
 Fetches the task list from an Ophix task server via `ophix-task-client` and writes managed systemd timer and service unit files. The full set of units is reconciled on every sync.
 
