@@ -31,7 +31,7 @@ classifiers = [
 ]
 dependencies = [
     "ophix-client-core>=2026.05.26.01",
-    "ophix-task-client>=2026.05.18.01",
+    "ophix-task-client>=2026.05.26.01",
 ]
 
 [project.urls]
