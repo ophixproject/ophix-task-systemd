@@ -12,10 +12,32 @@ license = "MIT"
 authors = [
     { name = "Ophix Project" }
 ]
-dependencies = [
-    "ophix-client-core>=2026.05.08.01",
-    "ophix-task-client>=2026.05.07.02",
+keywords = ["ophix", "systemd", "task scheduling", "fleet management"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Intended Audience :: System Administrators",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Systems Administration",
 ]
+dependencies = [
+    "ophix-client-core>=2026.05.26.01",
+    "ophix-task-client>=2026.05.18.01",
+]
+
+[project.urls]
+Homepage = "https://ophix.io"
+Documentation = "https://github.com/ophixproject/ophix-task-systemd#readme"
+Source = "https://github.com/ophixproject/ophix-task-systemd"
 
 [project.scripts]
 task-systemd = "ophix_task_systemd.cli:main"
