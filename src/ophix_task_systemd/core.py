@@ -93,15 +93,6 @@ import sys
 from datetime import datetime, timezone as dt_timezone
 from typing import Dict, List, Optional, Set, Tuple
 
-# task-client lives in the same venv bin directory as this process. Using
-# the full path ensures systemd (whose units run with a minimal environment,
-# not the invoking shell's PATH) can find it - same fix task-crontab already
-# has, applied here after a real end-to-end test caught its absence: a
-# report-mode unit failed with exit 127 (command not found) under a real
-# systemd --user session.
-_VENV_BIN = os.path.dirname(sys.executable)
-_TASK_CLIENT = os.path.join(_VENV_BIN, "task-client")
-
 MANAGED_PREFIX = "ophix-"
 DEFAULT_UNIT_DIR = "/etc/systemd/system"
 DEFAULT_USER_UNIT_DIR = "~/.config/systemd/user"
@@ -211,11 +202,14 @@ def _build_exec_start(task):
 
     if stdout == "report" and task_id is not None:
         if stderr in ("report", "merge"):
-            shell_cmd = "{} 2>&1 | {} report {}".format(command, _TASK_CLIENT, task_id)
+            shell_cmd = "{} 2>&1 | {} report {}".format(
+                command, _venv_bin_path("task-client"), task_id)
         else:
-            shell_cmd = "{} | {} report {}".format(command, _TASK_CLIENT, task_id)
+            shell_cmd = "{} | {} report {}".format(
+                command, _venv_bin_path("task-client"), task_id)
     elif stderr == "report" and task_id is not None:
-        shell_cmd = "{} 2>&1 1>/dev/null | {} report {}".format(command, _TASK_CLIENT, task_id)
+        shell_cmd = "{} 2>&1 1>/dev/null | {} report {}".format(
+            command, _venv_bin_path("task-client"), task_id)
     else:
         shell_cmd = command
 
