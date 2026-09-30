@@ -1,8 +1,8 @@
 # ophix-task-systemd
 
-systemd timer Tier 2 client for [Ophix Project](https://ophix.io) task scheduling.
+**Modern hosts run systemd timers — your task scheduling can too.**
 
-Fetches the task list from an Ophix task server via `ophix-task-client` and writes managed systemd timer and service unit files. The full set of units is reconciled on every sync.
+Writing and reconciling `.timer`/`.service` unit pairs by hand for every scheduled job is tedious and easy to get subtly wrong. `ophix-task-systemd` fetches your host's task list from [Ophix](https://ophix.io) and writes it as managed systemd timer/service units — new tasks get units and get enabled, changed tasks get rewritten, removed tasks get stopped and cleaned up, all reconciled fresh on every sync. Existing timer units can be imported in as a starting point rather than recreated by hand.
 
 ---
 
