@@ -2,7 +2,7 @@
 
 **Modern hosts run systemd timers — your task scheduling can too.**
 
-Writing and reconciling `.timer`/`.service` unit pairs by hand for every scheduled job is tedious and easy to get subtly wrong. `ophix-task-systemd` fetches your host's task list from [Ophix](https://ophix.io) and writes it as managed systemd timer/service units — new tasks get units and get enabled, changed tasks get rewritten, removed tasks get stopped and cleaned up, all reconciled fresh on every sync. Existing timer units can be imported in as a starting point rather than recreated by hand.
+Writing and reconciling `.timer`/`.service` unit pairs by hand for every scheduled job is tedious and easy to get subtly wrong. `ophix-task-systemd` fetches your host's task list from [Ophix](https://ophix.io) TaskServer and writes it as managed systemd timer/service units — new tasks get units and get enabled, changed tasks get rewritten, removed tasks get stopped and cleaned up, all reconciled fresh on every sync. Existing timer units can be imported in as a starting point rather than recreated by hand.
 
 ---
 
